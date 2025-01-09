@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "start": "node dist/infrastructure/server/start-server.js",
+    "start": "node -r module-alias/register dist/infrastructure/server/start-server.js",
     "start:docker": "docker compose down -v && docker compose up --build",
     "dev": "ts-node-dev -r tsconfig-paths/register src/infrastructure/server/start-server.ts",
     "build": "tsc",
@@ -21,7 +21,12 @@
     "jsonwebtoken": "^9.0.2",
     "koa": "^2.15.3",
     "koa-bodyparser": "^4.4.1",
+    "koa-static": "^5.0.0",
+    "koa-swagger-decorator": "^1.8.7",
     "pg": "^8.13.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-dist": "^5.18.2",
+    "swagger-ui-koa": "^0.0.1",
     "tsconfig-paths": "^4.2.0",
     "typeorm": "^0.3.20",
     "typeorm-naming-strategies": "^4.1.0"
@@ -29,6 +34,7 @@
   "devDependencies": {
     "@types/koa": "^2.15.0",
     "@types/koa__router": "^12.0.4",
+    "@types/swagger-jsdoc": "^6.0.4",
     "module-alias": "^2.2.3",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",

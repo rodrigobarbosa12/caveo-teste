@@ -13,6 +13,7 @@ const freeAccess = (originalUrl: string, method: string) => {
    */
   switch (true) {
     case originalUrl === '/auth':
+    case originalUrl === '/docs':
     case originalUrl.startsWith('/auth/'):
       return true
 

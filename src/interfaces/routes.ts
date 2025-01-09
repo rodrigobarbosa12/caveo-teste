@@ -1,8 +1,17 @@
 import * as Router from '@koa/router'
+import * as swaggerUi from 'swagger-ui-koa'
+import * as swaggerJSDoc from 'swagger-jsdoc'
+import swaggerOptions from 'src/infrastructure/swagger/config'
 import { auth, authCreate } from './auth'
-import { getUsers, editAccountById } from './user'
+import { getAllUsers, getMyUserOnly, editAccountById } from './user'
 
 const router = new Router()
+const swaggerSpec = swaggerJSDoc(swaggerOptions)
+
+/**\
+ * SWAGGER
+ */
+router.get('/docs', swaggerUi.setup(swaggerSpec))
 
 /**
  * AUTH
@@ -13,7 +22,8 @@ router.post('/auth', auth);
 /**
  * USERS
  */
-router.get('/users', getUsers)
+router.get('/users', getAllUsers)
+router.get('/me', getMyUserOnly)
 router.put('/users/:id', editAccountById)
 
 export default router

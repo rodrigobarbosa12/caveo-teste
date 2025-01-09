@@ -26,8 +26,20 @@ export async function editAccount(id: number, data: User, userRole: string) {
   await userRepository.save(user)
 }
 
-export async function getAllUsers() {
+export async function getAll() {
   const userRepository = appDataSource.getRepository(User)
 
-  return await userRepository.find()
+  const users = await userRepository.find()
+
+  return users.map(({ password, ...user }) => user)
+}
+
+export async function getOneUserByEmail(email: string) {
+  const userRepository = appDataSource.getRepository(User)
+
+  const user = await userRepository.findOneBy({ email })
+
+  delete user?.password
+
+  return user
 }

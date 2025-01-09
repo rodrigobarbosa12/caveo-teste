@@ -1,4 +1,4 @@
-import { editAccount, getAllUsers } from 'src/application/user'
+import { editAccount, getAll, getOneUserByEmail } from 'src/application/user'
 
 export async function editAccountById({ request, response }) {
   try {
@@ -13,7 +13,7 @@ export async function editAccountById({ request, response }) {
   }
 }
 
-export async function getUsers({ request, response }) {
+export async function getAllUsers({ request, response }) {
   try {
     const { session } = request
 
@@ -21,7 +21,18 @@ export async function getUsers({ request, response }) {
       throw new Error('Permissão negada')
     }
 
-    response.body = await getAllUsers()
+    response.body = await getAll()
+  } catch (error) {
+    response.status = error.status || 401
+    response.body = { message: error.message }
+  }
+}
+
+export async function getMyUserOnly({ request, response }) {
+  try {
+    const { session } = request
+
+    response.body = await getOneUserByEmail(session.email)
   } catch (error) {
     response.status = error.status || 401
     response.body = { message: error.message }
