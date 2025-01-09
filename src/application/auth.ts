@@ -4,6 +4,8 @@ import appDataSource from 'src/infrastructure/database/typeorm/index'
 import { User } from 'src/infrastructure/database/typeorm/entity/Users'
 import { ExceptionError } from 'src/infrastructure/utils'
 
+const { SECRET_KEY } = process.env
+
 export async function createUser(data: User) {
    const { email, name, role, password } = data
 
@@ -41,7 +43,7 @@ export async function authUser({ email, password }) {
    delete user.deletedAt
    delete user.password
 
-   const token = jwt.sign({ ...user }, 'SECRET_KEY', { expiresIn: '1h' })
+   const token = jwt.sign({ ...user }, SECRET_KEY, { expiresIn: '1h' })
 
    return { token }
  }

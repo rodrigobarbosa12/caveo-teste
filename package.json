@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "ts-node -r tsconfig-paths/register src/infrastructure/server/start-server.ts",
+    "dev": "ts-node-dev -r tsconfig-paths/register src/infrastructure/server/start-server.ts",
     "build": "tsc",
     "migration": "yarn build && yarn typeorm migration:run -d dist/infrastructure/database/typeorm/index.js"
   },
@@ -28,6 +28,7 @@
     "@types/koa": "^2.15.0",
     "@types/koa__router": "^12.0.4",
     "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.1.3"
   }
 }

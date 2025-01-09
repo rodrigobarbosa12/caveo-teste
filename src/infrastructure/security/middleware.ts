@@ -4,29 +4,16 @@ import * as jwt from 'jsonwebtoken'
 interface Decoded {
   id: number
   email: string
-  access: string
+  role: 'admin' | 'comum'
 }
 
 const freeAccess = (originalUrl: string, method: string) => {
-  if (method === 'GET' && originalUrl.match(/\/order\/.+/g)) {
-    return true
-  }
-
   /**
    * originalUrl.startsWith ignora qualquer coisa depois da ultima barra
    */
   switch (true) {
-    case originalUrl === '/auth/webhook-teste':
-    case originalUrl === '/auth/login':
-    case originalUrl === '/auth/signup':
-    case originalUrl === '/auth/forgot-password':
-    case originalUrl === '/scheduling/to-schedule-no-login':
-    case originalUrl === '/company/all':
-    case originalUrl.startsWith('/auth/confirm-email/'):
-    case originalUrl.startsWith('/auth/accept-invitation/'):
-    case originalUrl.startsWith('/scheduling/list/'):
-    case originalUrl.startsWith('/scheduling/check/'):
-    case originalUrl.startsWith('/public/images/'):
+    case originalUrl === '/auth':
+    case originalUrl.startsWith('/auth/'):
       return true
 
     default:
@@ -34,54 +21,52 @@ const freeAccess = (originalUrl: string, method: string) => {
   }
 }
 
-const middleware = ({ req, res }, next: Next): void => {
+async function middleware({ request: req, response: res }, next: Next): Promise<void> {
   if (freeAccess(req.path, req.method)) {
-    next()
+    await next()
     return
   }
 
   const authHeader = req.headers.authorization
 
   if (!authHeader) {
-    res.status(401).send({ message: 'Você não está autorizado' })
+    res.status = 401
+    res.body = { message: 'Você não está autorizado' }
     return
   }
 
-  // Bearer lkasdjfksdfaDJKÇLÇLKASDA
   const parts = authHeader.split(' ')
 
   if (parts.length !== 2) {
-    res.status(401).send({ message: 'Token error' })
+   res.status = 401
+   res.body = { message: 'Token error' }
     return
   }
 
   const [schema, token] = parts
 
-  // Verifica se Schema tem a palavra Bearer
   if (!/^Bearer$/i.test(schema)) {
-    res.status(401).send({ message: 'Token mal formado' })
+   res.status = 401
+   res.body = { message: 'Token mal formado' }
     return
   }
 
-  // verifica token
-  jwt.verify(
-    token,
-    'secret a-dsasddsa- a-sd-sa-ds-asd-dsa-dsa-dsa-asd',
-    (err: jwt.VerifyErrors | null, decoded: Decoded): void => {
-      if (err) {
-        res.status(401).send({ message: 'Token invalido' })
-        return
-      }
+  const { SECRET_KEY } = process.env
 
-      // req.session = {
-      //   userId: decoded.id,
-      //   email: decoded.email,
-      //   access: decoded.access,
-      // }
+  try {
+    const decoded = await jwt.verify(token, SECRET_KEY)
 
-      next()
-    },
-  )
+    req.session = {
+      userId: decoded.id,
+      email: decoded.email,
+      userRole: decoded.role,
+    }
+
+    await next()
+  } catch (error) {
+    res.status = 401
+    res.body = { message: 'Token inválido ou expirado' }
+  }
 }
 
 export default middleware

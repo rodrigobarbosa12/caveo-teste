@@ -37,7 +37,7 @@ export class User1736387148136 implements MigrationInterface {
           {
             name: 'is_onboarded',
             type: 'boolean',
-            default: true,
+            default: false,
           },
           {
             name: 'created_at',
