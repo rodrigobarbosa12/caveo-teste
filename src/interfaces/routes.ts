@@ -1,6 +1,6 @@
 import * as Router from '@koa/router'
 import { auth, authCreate } from './auth'
-import { editAccountById } from './user'
+import { getUsers, editAccountById } from './user'
 
 const router = new Router()
 
@@ -13,6 +13,7 @@ router.post('/auth', auth);
 /**
  * USERS
  */
+router.get('/users', getUsers)
 router.put('/users/:id', editAccountById)
 
 export default router

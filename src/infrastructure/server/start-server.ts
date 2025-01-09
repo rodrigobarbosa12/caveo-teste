@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import 'module-alias/register';
 import app from './start-config'
 import * as ip from 'ip'
 

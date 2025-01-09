@@ -6,7 +6,7 @@ export async function editAccount(id: number, data: User, userRole: string) {
   const { name, role } = data
 
   const userRepository = appDataSource.getRepository(User)
-  const user = await userRepository.findOneBy({ id})
+  const user = await userRepository.findOneBy({ id })
 
   if (!user) throw ExceptionError('Usuário não encontrado', 404)
 
@@ -24,4 +24,10 @@ export async function editAccount(id: number, data: User, userRole: string) {
   }
 
   await userRepository.save(user)
+}
+
+export async function getAllUsers() {
+  const userRepository = appDataSource.getRepository(User)
+
+  return await userRepository.find()
 }

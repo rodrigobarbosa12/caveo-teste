@@ -5,19 +5,15 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --legacy-peer-deps
+RUN yarn install
 
 COPY . .
 
-RUN npm run build
+# RUN yarn build && yarn typeorm migration:run -d dist/infrastructure/database/typeorm/index.js
 
-# Fase de produção
-FROM node:20-alpine AS production
-
-WORKDIR /app
-
-COPY --from=builder /app ./
+# Instalar o cliente PostgreSQL para ter acesso ao pg_isready
+RUN apk add --no-cache postgresql-client
 
 EXPOSE 3333
 
-CMD ["npm", "start"]
+CMD ["yarn", "start"]

@@ -3,12 +3,12 @@ import { DataSource } from 'typeorm'
 import * as path from 'path'
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
 
-const { DB_DATABASE, DB_PASSWORD, DB_HOST, DB_USER } = process.env
+const { DB_DATABASE, DB_PORT, DB_PASSWORD, DB_HOST, DB_USER } = process.env
 
 const appDataSource = new DataSource({
     type: 'postgres',
     host: DB_HOST,
-    port: 5432,
+    port: Number(DB_PORT),
     username: DB_USER,
     password: DB_PASSWORD,
     database: DB_DATABASE,
