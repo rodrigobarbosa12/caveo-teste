@@ -2,11 +2,15 @@ import { editAccount, getAll, getOneUserByEmail } from 'src/application/user'
 
 export async function editAccountById({ request, response }) {
   try {
-    const { body, params: { id }, session } = request
+    const {
+      body,
+      params: { id },
+      session,
+    } = request
 
     await editAccount(id, body, session.userRole)
 
-    response.body = { message: 'Usuário atualizado com sucesso!'}
+    response.body = { message: 'Usuário atualizado com sucesso!' }
   } catch (error) {
     response.status = error.status || 401
     response.body = { message: error.message }

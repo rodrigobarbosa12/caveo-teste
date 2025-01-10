@@ -7,7 +7,9 @@ export async function authCreate({ request, response }) {
 
     await createUser(body)
 
-    response.body = { message: 'Usuário criado, código de verificação enviado por email' }
+    response.body = {
+      message: 'Usuário criado, código de verificação enviado por email',
+    }
   } catch (error) {
     response.status = error.status || 401
     response.body = { message: error.message }
@@ -29,13 +31,13 @@ export async function confirmUser({ request, response }) {
 
 export async function auth({ request, response }) {
   try {
-     const { body } = request
+    const { body } = request
 
-     const result = await authUser(body)
+    const result = await authUser(body)
 
-     response.body = result
+    response.body = result
   } catch (error) {
-     response.status = error.status || 401
-     response.body = { message: error.message }
+    response.status = error.status || 401
+    response.body = { message: error.message }
   }
 }

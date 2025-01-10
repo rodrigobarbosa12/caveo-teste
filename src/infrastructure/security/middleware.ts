@@ -22,7 +22,10 @@ const freeAccess = (originalUrl: string, method: string) => {
   }
 }
 
-async function middleware({ request: req, response: res }, next: Next): Promise<void> {
+async function middleware(
+  { request: req, response: res },
+  next: Next,
+): Promise<void> {
   if (freeAccess(req.path, req.method)) {
     await next()
     return
@@ -39,16 +42,16 @@ async function middleware({ request: req, response: res }, next: Next): Promise<
   const parts = authHeader.split(' ')
 
   if (parts.length !== 2) {
-   res.status = 401
-   res.body = { message: 'Token error' }
+    res.status = 401
+    res.body = { message: 'Token error' }
     return
   }
 
   const [schema, token] = parts
 
   if (!/^Bearer$/i.test(schema)) {
-   res.status = 401
-   res.body = { message: 'Token mal formado' }
+    res.status = 401
+    res.body = { message: 'Token mal formado' }
     return
   }
 

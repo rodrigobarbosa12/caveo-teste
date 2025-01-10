@@ -1,4 +1,4 @@
-import { GetUserCommand } from "@aws-sdk/client-cognito-identity-provider"
+import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider'
 import { cognitoClient } from 'src/application/aws'
 import { User } from 'src/infrastructure/database/typeorm/entity/Users'
 import appDataSource from 'src/infrastructure/database/typeorm/index'
@@ -12,7 +12,8 @@ export async function editAccount(id: number, data: User, userRole: string) {
 
   if (!user) throw ExceptionError('Usuário não encontrado', 404)
 
-  if (userRole !== 'admin' && userRole !== 'comum') throw ExceptionError('Acesso negado', 401)
+  if (userRole !== 'admin' && userRole !== 'comum')
+    throw ExceptionError('Acesso negado', 401)
 
   if (userRole === 'admin') {
     user.name = name
@@ -33,7 +34,10 @@ export async function getAll() {
 
   const users = await userRepository.find()
 
-  return users.map(({ password, ...user }) => user)
+  return users.map((user) => {
+    delete user.password
+    return user
+  })
 }
 
 export async function getOneUserByEmail(email: string): Promise<User> {
@@ -53,14 +57,15 @@ export async function getUserForTokenAWS(token: string) {
 
   const response = await cognitoClient.send(command)
 
-  const userAWS = response
-    .UserAttributes
-    .reduce((acc, { Name, Value }) => ({ ...acc, [Name]: Value }), {}) as { email: string }
+  const userAWS = response.UserAttributes.reduce(
+    (acc, { Name, Value }) => ({ ...acc, [Name]: Value }),
+    {},
+  ) as { email: string }
 
   const user = await getOneUserByEmail(userAWS.email)
 
   if (!user) {
-    throw ExceptionError('Usuário não encontrado', 404);
+    throw ExceptionError('Usuário não encontrado', 404)
   }
   return user
 }

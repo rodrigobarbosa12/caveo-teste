@@ -1,4 +1,4 @@
-import { SwaggerDefinition, Options } from 'swagger-jsdoc';
+import { SwaggerDefinition, Options } from 'swagger-jsdoc'
 
 const swaggerDefinition: SwaggerDefinition = {
   openapi: '3.0.0',
@@ -16,11 +16,11 @@ const swaggerDefinition: SwaggerDefinition = {
   tags: [
     {
       name: 'AUTH',
-      description: 'Endpoints de autenticação'
+      description: 'Endpoints de autenticação',
     },
     {
       name: 'USERS',
-      description: 'Endpoints de usuários'
+      description: 'Endpoints de usuários',
     },
   ],
   components: {
@@ -46,14 +46,14 @@ const swaggerDefinition: SwaggerDefinition = {
               type: 'object',
               properties: {
                 email: {
-                  example: 'johndoe@email.com'
+                  example: 'johndoe@email.com',
                 },
                 password: {
-                  example: 'johndoe_123'
-                }
-              }
+                  example: 'johndoe_123',
+                },
+              },
             },
-          }
+          },
         ],
         responses: {
           200: {
@@ -78,20 +78,20 @@ const swaggerDefinition: SwaggerDefinition = {
               type: 'object',
               properties: {
                 name: {
-                  example: 'John Doe'
+                  example: 'John Doe',
                 },
                 email: {
-                  example: 'johndoe@email.com'
+                  example: 'johndoe@email.com',
                 },
                 password: {
-                  example: 'johndoe_123'
+                  example: 'johndoe_123',
                 },
                 role: {
-                  example: 'comum'
+                  example: 'comum',
                 },
-              }
+              },
             },
-          }
+          },
         ],
         responses: {
           201: {
@@ -172,14 +172,14 @@ const swaggerDefinition: SwaggerDefinition = {
               type: 'object',
               properties: {
                 name: {
-                  example: 'John Doe'
+                  example: 'John Doe',
                 },
                 role: {
-                  example: 'comum'
+                  example: 'comum',
                 },
-              }
+              },
             },
-          }
+          },
         ],
         responses: {
           201: {
@@ -192,11 +192,11 @@ const swaggerDefinition: SwaggerDefinition = {
       },
     },
   },
-};
+}
 
 const options: Options = {
   swaggerDefinition,
   apis: [],
-};
+}
 
-export default options;
+export default options

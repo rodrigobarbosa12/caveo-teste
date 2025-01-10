@@ -8,23 +8,23 @@ export async function createUser(data: User) {
 
   const userRepository = appDataSource.getRepository(User)
 
- const existingUser = await userRepository.findOne({ where: { email } })
- if (existingUser) throw ExceptionError('Usuário já existe!', 401)
+  const existingUser = await userRepository.findOne({ where: { email } })
+  if (existingUser) throw ExceptionError('Usuário já existe!', 401)
 
- const newUser = {
-  email,
-  name,
-  role,
-  isOnboarded: false,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-}
+  const newUser = {
+    email,
+    name,
+    role,
+    isOnboarded: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }
 
- return await userRepository.manager.transaction(async transaction => {
-   const user = await transaction.save(User, newUser)
-   await signUpAWS({ email, password, name })
-   return user
- })
+  return await userRepository.manager.transaction(async (transaction) => {
+    const user = await transaction.save(User, newUser)
+    await signUpAWS({ email, password, name })
+    return user
+  })
 }
 
 export async function authUser({ email, password }) {

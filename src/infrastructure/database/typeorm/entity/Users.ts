@@ -20,9 +20,9 @@ export class User {
   password?: string
 
   @Column({
-   type: 'enum',
-   enum: ['admin', 'comun'],
-   default: 'comum',
+    type: 'enum',
+    enum: ['admin', 'comun'],
+    default: 'comum',
   })
   role: string
 
