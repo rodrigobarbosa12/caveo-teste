@@ -1,6 +1,7 @@
 import { hash, compare } from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
-import appDataSource from 'src/infrastructure/database/typeorm/index'
+import appDataSource from 'src/infrastructure/database/typeorm'
+import { signUpAWS, signInAWS } from './aws'
 import { User } from 'src/infrastructure/database/typeorm/entity/Users'
 import { ExceptionError } from 'src/infrastructure/utils'
 
@@ -26,24 +27,28 @@ export async function createUser(data: User) {
    updatedAt: new Date(),
  }
 
-  return await userRepository.save(newUser)
+  return await userRepository.manager.transaction(async transaction => {
+    const user = await transaction.save(User, newUser)
+    // await signUpAWS(email, password)
+    return user
+  })
 }
 
 export async function authUser({ email, password }) {
-   const userRepository = appDataSource.getRepository(User)
+  const userRepository = appDataSource.getRepository(User)
 
-   const user = await userRepository.findOne({ where: { email } })
-   if (!user) throw new Error('Usuário não encontrado!')
+  const user = await userRepository.findOne({ where: { email } })
+  if (!user) throw new Error('Usuário não encontrado!')
 
-   const passwordMatch = await compare(password, user.password)
-   if (!passwordMatch) throw new Error('Senha incorreta!')
+  const passwordMatch = await compare(password, user.password)
+  if (!passwordMatch) throw new Error('Senha incorreta!')
 
-   delete user.createdAt
-   delete user.updatedAt
-   delete user.deletedAt
-   delete user.password
+  delete user.createdAt
+  delete user.updatedAt
+  delete user.deletedAt
+  delete user.password
 
-   const token = jwt.sign({ ...user }, SECRET_KEY, { expiresIn: '1h' })
+  const token = jwt.sign({ ...user }, SECRET_KEY, { expiresIn: '1h' })
 
-   return { token }
- }
+  return { token }
+}
