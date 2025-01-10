@@ -81,6 +81,21 @@ Aqui está o **coverage report** dos testes:
 
 ![Coverage Report](images/image.png)
 
+## 📄 Documentação da API
+
+### 📜 Swagger
+
+A documentação da API está disponível através do **Swagger**. Para acessá-la, inicie o servidor e acesse a rota:
+
+```
+http://localhost:3333/docs
+```
+### 📁 Collections do Insomnia
+
+Para facilitar os testes da API, as **collections do Insomnia** estão disponíveis na pasta `tools`, localizada na raiz do projeto.
+Basta importá-las no **Insomnia** para realizar requisições rapidamente e verificar os endpoints.
+
+
 ## 🛠️ Tecnologias Utilizadas
 
 - **Node.js**: Ambiente de execução JavaScript 🟩.

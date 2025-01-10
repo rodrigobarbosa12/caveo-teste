@@ -33,38 +33,6 @@ const swaggerDefinition: SwaggerDefinition = {
     },
   },
   paths: {
-    '/auth': {
-      post: {
-        tags: ['AUTH'],
-        summary: 'Login do usuário',
-        parameters: [
-          {
-            in: 'body',
-            name: 'data',
-            description: 'Credenciais para login',
-            schema: {
-              type: 'object',
-              properties: {
-                email: {
-                  example: 'johndoe@email.com',
-                },
-                password: {
-                  example: 'johndoe_123',
-                },
-              },
-            },
-          },
-        ],
-        responses: {
-          200: {
-            description: 'login successful',
-          },
-          500: {
-            description: 'login error',
-          },
-        },
-      },
-    },
     '/auth/create': {
       post: {
         tags: ['AUTH'],
@@ -84,7 +52,7 @@ const swaggerDefinition: SwaggerDefinition = {
                   example: 'johndoe@email.com',
                 },
                 password: {
-                  example: 'johndoe_123',
+                  example: 'Mudar@123',
                 },
                 role: {
                   example: 'comum',
@@ -102,6 +70,70 @@ const swaggerDefinition: SwaggerDefinition = {
           },
           500: {
             description: 'Update error',
+          },
+        },
+      },
+    },
+    '/auth/confirmation': {
+      post: {
+        tags: ['AUTH'],
+        summary: 'Confirmar o usuário',
+        parameters: [
+          {
+            in: 'body',
+            name: 'data',
+            description: 'Dados para confirmação do usuário',
+            schema: {
+              type: 'object',
+              properties: {
+                email: {
+                  example: 'johndoe@email.com',
+                },
+                code: {
+                  example: '605164',
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: 'login successful',
+          },
+          500: {
+            description: 'login error',
+          },
+        },
+      },
+    },
+    '/auth': {
+      post: {
+        tags: ['AUTH'],
+        summary: 'Login do usuário',
+        parameters: [
+          {
+            in: 'body',
+            name: 'data',
+            description: 'Credenciais para login',
+            schema: {
+              type: 'object',
+              properties: {
+                email: {
+                  example: 'johndoe@email.com',
+                },
+                password: {
+                  example: 'Mudar@123',
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: 'login successful',
+          },
+          500: {
+            description: 'login error',
           },
         },
       },
