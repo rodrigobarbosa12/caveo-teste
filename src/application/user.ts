@@ -1,3 +1,5 @@
+import { GetUserCommand } from "@aws-sdk/client-cognito-identity-provider"
+import { cognitoClient } from 'src/application/aws'
 import { User } from 'src/infrastructure/database/typeorm/entity/Users'
 import appDataSource from 'src/infrastructure/database/typeorm/index'
 import { ExceptionError } from 'src/infrastructure/utils'
@@ -34,12 +36,31 @@ export async function getAll() {
   return users.map(({ password, ...user }) => user)
 }
 
-export async function getOneUserByEmail(email: string) {
+export async function getOneUserByEmail(email: string): Promise<User> {
   const userRepository = appDataSource.getRepository(User)
 
   const user = await userRepository.findOneBy({ email })
 
   delete user?.password
 
+  return user
+}
+
+export async function getUserForTokenAWS(token: string) {
+  const command = new GetUserCommand({
+    AccessToken: token,
+  })
+
+  const response = await cognitoClient.send(command)
+
+  const userAWS = response
+    .UserAttributes
+    .reduce((acc, { Name, Value }) => ({ ...acc, [Name]: Value }), {}) as { email: string }
+
+  const user = await getOneUserByEmail(userAWS.email)
+
+  if (!user) {
+    throw ExceptionError('Usuário não encontrado', 404);
+  }
   return user
 }

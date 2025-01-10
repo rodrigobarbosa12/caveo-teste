@@ -1,9 +1,7 @@
 import { createUser, authUser } from 'src/application/auth'
+import { signUpAWS, signInAWS } from 'src/application/aws'
 import { User } from 'src/infrastructure/database/typeorm/entity/Users'
 import appDataSource from 'src/infrastructure/database/typeorm'
-import * as bcryptjs from 'bcryptjs'
-import { hash } from 'bcryptjs'
-import * as jwt from 'jsonwebtoken'
 
 jest.mock('src/infrastructure/database/typeorm', () => ({
   default: {
@@ -11,13 +9,9 @@ jest.mock('src/infrastructure/database/typeorm', () => ({
   },
 }));
 
-jest.mock('bcryptjs', () => ({
-  compare: jest.fn(),
-  hash: jest.fn(),
-}));
-
-jest.mock('jsonwebtoken', () => ({
-  sign: jest.fn(),
+jest.mock('src/application/aws', () => ({
+  signUpAWS: jest.fn(),
+  signInAWS: jest.fn(),
 }));
 
 describe('createUser', () => {
@@ -41,15 +35,12 @@ describe('createUser', () => {
   it('deve criar um novo usuário com sucesso', async () => {
     const data = {
       email: 'rodrigo@email.com',
-      password: 'teste#123',
+      password: 'Mudar@123',
       name: 'Rodrigo Barbosa',
       role: 'admin'
     } as User
 
-    const hashedPassword = 'hashedPassword123';
-    (hash as jest.Mock).mockResolvedValue(hashedPassword);
-
-    const newUser = { ...data, password: hashedPassword, isOnboarded: false };
+    const newUser = { ...data, isOnboarded: false };
 
     mockUserRepository.manager.transaction.mockImplementation(async (callback: any) => {
       return await callback({
@@ -62,9 +53,14 @@ describe('createUser', () => {
     const result = await createUser(data);
 
     expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { email: data.email } });
-    expect(hash).toHaveBeenCalledWith(data.password, 10);
     expect(mockUserRepository.manager.transaction).toHaveBeenCalled();
     expect(result).toEqual(newUser);
+
+    expect(signUpAWS).toHaveBeenCalledWith({
+      email: data.email,
+      password: data.password,
+      name: data.name,
+    });
   });
 
   it('deve lançar erro se o usuário já existir', async () => {
@@ -72,27 +68,23 @@ describe('createUser', () => {
 
     const data = {
       email: 'rodrigo@email.com',
-      password: 'teste#123',
+      password: 'Mudar@123',
       name: 'Rodrigo Barbosa',
       role: 'admin'
     } as User
 
     await expect(createUser(data)).rejects.toThrow('Usuário já existe!');
     expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { email: data.email } });
-    expect(hash).not.toHaveBeenCalled();
     expect(mockUserRepository.manager.transaction).not.toHaveBeenCalled();
   });
 
   it('deve lançar erro se a transação falhar', async () => {
     const data = {
       email: 'rodrigo@email.com',
-      password: 'teste#123',
+      password: 'Mudar@123',
       name: 'Rodrigo Barbosa',
       role: 'admin'
     } as User
-
-    const hashedPassword = 'hashedPassword123';
-    (hash as jest.Mock).mockResolvedValue(hashedPassword);
 
     mockUserRepository.findOne.mockResolvedValue(null);
 
@@ -100,7 +92,6 @@ describe('createUser', () => {
 
     await expect(createUser(data)).rejects.toThrow('Transaction failed');
     expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { email: data.email } });
-    expect(hash).toHaveBeenCalledWith(data.password, 10);
     expect(mockUserRepository.manager.transaction).toHaveBeenCalled();
   });
 });
@@ -125,55 +116,29 @@ describe('authUser', () => {
       id: 1,
       email: 'rodrigo@email.com',
       name: 'Rodrigo Barbosa',
-      // password: 'teste#123',
+      password: 'Mudar@123',
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: null,
     };
 
-    const token = 'mockedToken';
-
     mockUserRepository.findOne.mockResolvedValue(user);
-    (bcryptjs.compare as jest.Mock).mockResolvedValue(true);
-    (jwt.sign as jest.Mock).mockReturnValue(token);
 
-    const result = await authUser({ email: 'rodrigo@email.com', password: 'teste#123' });
+    const result = await authUser({ email: 'rodrigo@email.com', password: 'Mudar@123' });
 
     expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { email: 'rodrigo@email.com' } });
-    expect(bcryptjs.compare).toHaveBeenCalledWith('teste#123', undefined);
-    expect(result).toEqual({ token });
+    expect(signInAWS).toHaveBeenCalledWith("rodrigo@email.com", "Mudar@123");
+    expect(result).toEqual(undefined);
   });
 
   it('deve lançar erro se o usuário não for encontrado', async () => {
     mockUserRepository.findOne.mockResolvedValue(null);
 
-    await expect(authUser({ email: 'invalid@example.com', password: 'teste#123' }))
+    await expect(authUser({ email: 'invalid@example.com', password: 'Mudar@123' }))
       .rejects
-      .toThrow('Usuário não encontrado!');
+      .toThrow('Usuário ou senha inválidos!');
 
     expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { email: 'invalid@example.com' } });
-  });
-
-  it('deve lançar erro se a senha estiver incorreta', async () => {
-    const user = {
-      id: 1,
-      email: 'rodrigo@email.com',
-      name: 'Rodrigo Barbosa',
-      password: 'teste#123',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
-    };
-
-    mockUserRepository.findOne.mockResolvedValue(user);
-    (bcryptjs.compare as jest.Mock).mockResolvedValue(false);
-
-    await expect(authUser({ email: 'rodrigo@email.com', password: 'teste#123' }))
-      .rejects
-      .toThrow('Senha incorreta!');
-
-    expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { email: 'rodrigo@email.com' } });
-    expect(bcryptjs.compare).toHaveBeenCalledWith('teste#123', user.password);
   });
 });
 

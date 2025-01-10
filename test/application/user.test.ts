@@ -1,6 +1,18 @@
-import { editAccount, getAll, getOneUserByEmail } from 'src/application/user'
+import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { cognitoClient } from 'src/application/aws';
+import { editAccount, getAll, getUserForTokenAWS, getOneUserByEmail } from 'src/application/user'
 import { User } from 'src/infrastructure/database/typeorm/entity/Users'
 import appDataSource from 'src/infrastructure/database/typeorm'
+
+jest.mock('@aws-sdk/client-cognito-identity-provider', () => ({
+  GetUserCommand: jest.fn(),
+}));
+
+jest.mock('src/application/aws', () => ({
+  cognitoClient: {
+    send: jest.fn(),
+  },
+}));
 
 jest.mock('src/infrastructure/database/typeorm', () => ({
   default: {
@@ -194,3 +206,68 @@ describe('getOneUserByEmail', () => {
   });
 });
 
+
+describe('getUserForTokenAWS', () => {
+  let mockUserRepository: any;
+
+  beforeEach(() => {
+    mockUserRepository = appDataSource.getRepository(User);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('deve retornar o usuário encontrado no banco de dados com base no email do token AWS', async () => {
+    const token = 'fake-token';
+    const awsResponse = {
+      UserAttributes: [
+        { Name: 'email', Value: 'user@example.com' },
+      ],
+    };
+
+    const userFromDb = {
+      id: 1,
+      email: 'user@example.com',
+      name: 'User 1',
+      password: 'password123',
+      role: 'admin',
+    };
+
+    (cognitoClient.send as jest.Mock).mockResolvedValue(awsResponse);
+
+    mockUserRepository.findOneBy.mockResolvedValue(userFromDb);
+
+    const result = await getUserForTokenAWS(token);
+
+    expect(cognitoClient.send).toHaveBeenCalledWith(expect.any(GetUserCommand));
+    expect(mockUserRepository.findOneBy).toHaveBeenCalledWith({ email: 'user@example.com' });
+    expect(result).toEqual({
+      id: 1,
+      email: 'user@example.com',
+      name: 'User 1',
+      role: 'admin',
+    });
+    expect(result).not.toHaveProperty('password');
+  });
+
+  it('deve lançar um erro se o usuário não for encontrado no banco de dados', async () => {
+    const token = 'fake-token';
+    const awsResponse = {
+      UserAttributes: [
+        { Name: 'email', Value: 'user@example.com' },
+      ],
+    };
+
+    (cognitoClient.send as jest.Mock).mockResolvedValue(awsResponse);
+
+    mockUserRepository.findOneBy.mockResolvedValue(null);
+
+    await expect(getUserForTokenAWS(token))
+      .rejects
+      .toThrow('Usuário não encontrado');
+
+    expect(cognitoClient.send).toHaveBeenCalledWith(expect.any(GetUserCommand));
+    expect(mockUserRepository.findOneBy).toHaveBeenCalledWith({ email: 'user@example.com' });
+  });
+});

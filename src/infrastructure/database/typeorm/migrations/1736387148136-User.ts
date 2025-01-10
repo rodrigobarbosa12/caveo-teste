@@ -24,11 +24,6 @@ export class User1736387148136 implements MigrationInterface {
             length: '2000',
           },
           {
-            name: 'password',
-            type: 'varchar',
-            length: '2000',
-          },
-          {
             name: 'role',
             type: 'enum',
             enum: ['admin', 'comum'],

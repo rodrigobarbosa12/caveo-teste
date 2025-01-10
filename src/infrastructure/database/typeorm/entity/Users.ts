@@ -4,8 +4,6 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne,
-  OneToMany,
 } from 'typeorm'
 
 @Entity({ name: 'users' })
@@ -19,8 +17,7 @@ export class User {
   @Column({ length: 150 })
   email: string
 
-  @Column({ length: 200 })
-  password: string
+  password?: string
 
   @Column({
    type: 'enum',

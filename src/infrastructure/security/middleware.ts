@@ -1,5 +1,5 @@
-import { Request, Next } from 'koa'
-import * as jwt from 'jsonwebtoken'
+import { Next } from 'koa'
+import { getUserForTokenAWS } from 'src/application/user'
 
 interface Decoded {
   id: number
@@ -52,15 +52,13 @@ async function middleware({ request: req, response: res }, next: Next): Promise<
     return
   }
 
-  const { SECRET_KEY } = process.env
-
   try {
-    const decoded = await jwt.verify(token, SECRET_KEY)
+    const user = await getUserForTokenAWS(token)
 
     req.session = {
-      userId: decoded.id,
-      email: decoded.email,
-      userRole: decoded.role,
+      userId: user.id,
+      email: user.email,
+      userRole: user.role,
     }
 
     await next()

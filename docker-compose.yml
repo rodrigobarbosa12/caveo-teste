@@ -17,7 +17,7 @@ services:
       - db
     command: >
       sh -c "until pg_isready -h ${DB_HOST} -p ${DB_PORT}; do echo waiting for db; sleep 2; done;
-      yarn build && yarn typeorm migration:run -d dist/infrastructure/database/typeorm/index.js && yarn start"
+      yarn build && yarn typeorm migration:run -d dist/src/infrastructure/database/typeorm/index.js && yarn start"
     networks:
       - app-network
   db:
