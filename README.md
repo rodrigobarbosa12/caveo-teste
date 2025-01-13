@@ -87,14 +87,21 @@ Aqui está o **coverage report** dos testes:
 
 A documentação da API está disponível através do **Swagger**. Para acessá-la, inicie o servidor e acesse a rota:
 
+Local
 ```
 http://localhost:3333/docs
+```
+
+Publicado na AWS
+```
+http://15.229.19.111:3333/docs
 ```
 ### 📁 Collections do Insomnia
 
 Para facilitar os testes da API, as **collections do Insomnia** estão disponíveis na pasta `tools`, localizada na raiz do projeto.
 Basta importá-las no **Insomnia** para realizar requisições rapidamente e verificar os endpoints.
 
+Você pode user as mesmas URLs do **Swagger** para usar no **Insomnia**
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -105,3 +112,4 @@ Basta importá-las no **Insomnia** para realizar requisições rapidamente e ver
 - **PostgreSQL**: Banco de dados relacional 🗄️.
 - **AWS Cognito**: Serviço de autenticação e gerenciamento de usuários ☁️.
 - **Jest**: Framework de testes 🧪.
+- **Docker**: Framework de testes 🐳.
